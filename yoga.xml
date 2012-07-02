@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<project>
+	<yoga-version>1</yoga-version>
+	<compiler-version>2.0.9</compiler-version>
+	
+	<id>com.wighawag.remote.wighawag-remote</id>
+	<version>0.1</version>
+
+	<sources>
+		<source path="src" />
+	</sources>
+
+	<dependencies>
+		<repository id="com.wighawag.report.Report" version="0.1" />
+	</dependencies>
+	
+</project>
