@@ -1,8 +1,8 @@
 package com.wighawag.remote.service;
 
+import com.wighawag.remote.Channels;
 import hsl.haxe.DirectSignaler;
 import hsl.haxe.Signaler;
-import com.wighawag.report.Report;
 
 class Response<SuccessType, ErrorType : ServiceError>
 {
@@ -39,7 +39,7 @@ class Response<SuccessType, ErrorType : ServiceError>
 	{
 		if (!errorListenedTo)
 		{
-			Report.anError(error.text);
+			Report.anError(Channels.REMOTE, error.text);
 		}
 		errorSignaler.dispatch(error);
 	}
