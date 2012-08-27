@@ -2,6 +2,7 @@ package com.wighawag.remote.authentification;
 
 import nme.events.Event;
 import nme.events.IOErrorEvent;
+import nme.events.SecurityErrorEvent;
 import nme.net.URLLoader;
 import nme.net.URLRequest;
 import nme.net.URLLoaderDataFormat;
@@ -35,7 +36,8 @@ class PasswordAuthentification
 		request.data = new URLVariables("userId="+userId+"&password="+password+"&method=signedRequest");
 		
 		var urlLoader : URLLoader = new URLLoader();
-		urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
+		urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onError);
+        urlLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onError);
 		urlLoader.addEventListener(Event.COMPLETE, onComplete);
 		urlLoader.load(request);
 		
@@ -43,7 +45,7 @@ class PasswordAuthentification
 		return onAuthenticated;
 	}
 	
-	private function onIOError(event:IOErrorEvent):Void 
+	private function onError(event:Event):Void
 	{
 		trace(event.toString());
 		// TODO : for now : 
