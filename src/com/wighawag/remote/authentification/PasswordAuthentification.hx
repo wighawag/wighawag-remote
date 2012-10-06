@@ -39,16 +39,26 @@ class PasswordAuthentification
 		urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onError);
         urlLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onError);
 		urlLoader.addEventListener(Event.COMPLETE, onComplete);
-		urlLoader.load(request);
+
+
+        try{
+            urlLoader.load(request);
+        }
+        catch(e : Dynamic){
+            var timer : haxe.Timer = new haxe.Timer(10);
+            timer.run = function(): Void{onError(null);timer.stop();};
+        }
 		
 		onAuthenticated = new DirectSignaler(this);
 		return onAuthenticated;
 	}
 	
-	private function onError(event:Event):Void
+	private function onError(?event:Event):Void
 	{
-		trace(event.toString());
-		// TODO : for now : 
+        if (event != null){
+            trace(event.toString());
+        }
+		// TODO : for now :
 		onAuthenticated.dispatch(null);
 	}
 	
