@@ -4,14 +4,15 @@
 	<compiler-version>2.10</compiler-version>
 	
 	<id>com.wighawag.remote</id>
-	<version>0.1.1-SNAPSHOT</version>
+	<version>0.1.1</version>
+	<prepared>2013-02-23 22:19:11</prepared>
 
 	<sources>
 		<source path="src" />
 	</sources>
 
 	<dependencies>
-		<repository id="com.wighawag.report.Report" version="0.1.1-SNAPSHOT" />
+		<repository id="com.wighawag.report.Report" version="0.1.1" />
 	</dependencies>
 	
 </project>
