@@ -1,16 +1,23 @@
-package com.wighawag.remote;
+/****
+* Wighawag License:
+* - free to use for commercial and non commercial application
+* - provided the modification done to it are given back to the community
+* - use at your own risk
+* 
+****/
 
-import com.wighawag.remote.service.Alternative;
-import com.wighawag.remote.service.ErrorMessage;
-import com.wighawag.remote.service.HighScoreService;
-import com.wighawag.remote.service.Response;
-import com.wighawag.remote.service.RetryMessage;
-import com.wighawag.remote.service.Score;
-import com.wighawag.remote.service.Seed;
-import nme.Lib;
+package wighawag.remote;
 
-import hsl.haxe.DirectSignaler;
-import hsl.haxe.Signaler;
+import haxe.ds.StringMap;
+import wighawag.remote.service.Alternative;
+import wighawag.remote.service.ErrorMessage;
+import wighawag.remote.service.HighScoreService;
+import wighawag.remote.service.Response;
+import wighawag.remote.service.RetryMessage;
+import wighawag.remote.service.Score;
+import wighawag.remote.service.Seed;
+
+import msignal.Signal;
 
 class RemoteHighScoreService implements HighScoreService
 {
@@ -24,7 +31,7 @@ class RemoteHighScoreService implements HighScoreService
 	public function echo(message : String) : Response<String, ErrorMessage>
 	{
 		var response : Response<String, ErrorMessage> = new Response<String, ErrorMessage>();
-		remote.signedRequestCall(["score.service.echo", [message]]).bind(function(value : Dynamic): Void {
+		remote.signedRequestCall(["score.service.echo", [message]]).add(function(value : Dynamic): Void {
 			if (Reflect.hasField(value, "result"))
 			{
 				response.processSuccess(value.result);
@@ -40,7 +47,7 @@ class RemoteHighScoreService implements HighScoreService
 	public function start() : Response<Seed, ErrorMessage>
 	{
 		var response : Response<Seed, ErrorMessage> = new Response<Seed, ErrorMessage>();
-		remote.signedRequestCall(["score.service.start"]).bind(function(value : Dynamic): Void {
+		remote.signedRequestCall(["score.service.start"]).add(function(value : Dynamic): Void {
 			if (Reflect.hasField(value, "result"))
 			{
 				response.processSuccess(new Seed(value.result.seed, "1")); // TODO use version from server
@@ -60,12 +67,12 @@ class RemoteHighScoreService implements HighScoreService
 	*/
 	public function setScore(score : Score) : Response<String, ErrorMessage>
 	{
-		var scoreValues : Hash<Dynamic> = new Hash<Dynamic>();
+		var scoreValues : StringMap<Dynamic> = new StringMap();
 		scoreValues.set("score", score.value);
 		scoreValues.set("time", score.time);
 		scoreValues.set("proof", score.proof);
 		var response : Response<String, ErrorMessage> = new Response<String, ErrorMessage>();
-		remote.signedRequestCall(["score.service.setScore", [scoreValues]]).bind(function(value : Dynamic): Void {
+		remote.signedRequestCall(["score.service.setScore", [scoreValues]]).add(function(value : Dynamic): Void {
 			if (Reflect.hasField(value, "result"))
 			{
 				response.processSuccess(value.result.message);
@@ -81,7 +88,7 @@ class RemoteHighScoreService implements HighScoreService
 	public function getOwnHighScore():Response<Score, ErrorMessage>  
 	{
 		var response : Response<Score, ErrorMessage> = new Response<Score, ErrorMessage>();
-		remote.signedRequestCall(["score.service.getOwnHighScore"]).bind(function(value : Dynamic): Void {
+		remote.signedRequestCall(["score.service.getOwnHighScore"]).add(function(value : Dynamic): Void {
 			if (Reflect.hasField(value, "result"))
 			{
 				response.processSuccess(new Score(value.result.score,value.result.time, null, null, "1")); // TODO use version given by server
@@ -97,7 +104,7 @@ class RemoteHighScoreService implements HighScoreService
 	public function getRandomScore():Response<Alternative<Score,RetryMessage>, ErrorMessage>
 	{
 		var response : Response<Alternative<Score,RetryMessage>, ErrorMessage> = new Response<Alternative<Score,RetryMessage>, ErrorMessage>();
-		remote.signedRequestCall(["score.service.getRandomScore"]).bind(function(value : Dynamic): Void {
+		remote.signedRequestCall(["score.service.getRandomScore"]).add(function(value : Dynamic): Void {
 			if (Reflect.hasField(value, "result"))
 			{
 				var alternative : Alternative<Score,RetryMessage>;
@@ -121,11 +128,11 @@ class RemoteHighScoreService implements HighScoreService
 	
 	public function reviewScore(scoreReview : Score):Response<String, ErrorMessage>
 	{
-		var scoreValues : Hash<Dynamic> = new Hash<Dynamic>();
+		var scoreValues : StringMap<Dynamic> = new StringMap();
 		scoreValues.set("score", scoreReview.value);
 		scoreValues.set("time", scoreReview.time);
 		var response : Response<String, ErrorMessage> = new Response<String, ErrorMessage>();
-		remote.signedRequestCall(["score.service.reviewScore", [scoreValues]]).bind(function(value : Dynamic): Void {
+		remote.signedRequestCall(["score.service.reviewScore", [scoreValues]]).add(function(value : Dynamic): Void {
 			if (Reflect.hasField(value, "result"))
 			{
 				response.processSuccess(value.result.message);
@@ -144,7 +151,7 @@ class RemoteHighScoreService implements HighScoreService
 	public function forceReviewTimeUnit(value : Int) : Response<Int, ErrorMessage>
 	{
 		var response : Response<Int, ErrorMessage> = new Response<Int, ErrorMessage>();
-		remote.signedRequestCall(["score.service.forceReviewTimeUnit", [value]]).bind(function(value : Dynamic): Void {
+		remote.signedRequestCall(["score.service.forceReviewTimeUnit", [value]]).add(function(value : Dynamic): Void {
 			if (Reflect.hasField(value, "result"))
 			{
 				response.processSuccess(value.result.oldReviewTimeUnit);

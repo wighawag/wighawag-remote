@@ -1,16 +1,20 @@
-package com.wighawag.remote.amf;
+/****
+* Wighawag License:
+* - free to use for commercial and non commercial application
+* - provided the modification done to it are given back to the community
+* - use at your own risk
+* 
+****/
 
-import com.wighawag.remote.RemoteCall;
-import de.polygonal.core.io.Base64;
-import nme.Lib;
+package wighawag.remote.amf;
+
+import haxe.Json;
+import wighawag.remote.RemoteCall;
+import de.polygonal.core.codec.Base64;
 import haxe.remoting.AMFConnection;
-import haxe.SHA1;
+import haxe.crypto.Sha1;
 import de.polygonal.ds.IntHashTable;
-
-import hsl.haxe.DirectSignaler;
-import hsl.haxe.Signaler;
-
-import hxjson2.JSON;
+import msignal.Signal;
 
 class AMFSignedRequestService implements RemoteCall
 {
@@ -20,7 +24,7 @@ class AMFSignedRequestService implements RemoteCall
 	
 	private var requestCounter : Int;
 	
-	private var signalers : IntHashTable<Signaler<Dynamic>> ;
+	private var signals : IntHashTable<Signal1<Dynamic>> ;
 	
 	public function new(url : String, playerId : String, secretKey : String) 
 	{
@@ -29,7 +33,7 @@ class AMFSignedRequestService implements RemoteCall
 		connection = AMFConnection.urlConnect(url);
 		connection.setErrorHandler(onError);
 		requestCounter = 0;
-		signalers = new IntHashTable<Signaler<Dynamic>>(16);
+		signals = new IntHashTable<Signal1<Dynamic>>(16);
 	}
 	
 	private function onError(error : Dynamic):Void 
@@ -37,7 +41,7 @@ class AMFSignedRequestService implements RemoteCall
 		trace(error);
 	}
 	
-	public function signedRequestCall(params : Array<Dynamic>): Signaler<Dynamic>
+	public function signedRequestCall(params : Array<Dynamic>): Signal1<Dynamic>
 	{
 		requestCounter += 1;
 		
@@ -50,28 +54,28 @@ class AMFSignedRequestService implements RemoteCall
 		}
 		
 		
-		var jsonData : String = JSON.stringify(parameters);
+		var jsonData : String = Json.stringify(parameters);
 		var data : String = Base64.encodeString(jsonData);
 		
 		
-		var signature : String = SHA1.encode(secretKey + data + secretKey);
+		var signature : String = Sha1.encode(secretKey + data + secretKey);
 		
 		
 		var encoded_signature :String = Base64.encodeString(signature);
 		
 		var request : String = encoded_signature + "." + data;
 		
-		var signaler : Signaler<Dynamic> = new DirectSignaler<Dynamic>(this);
-		signalers.set(requestCounter, signaler);
+		var signal : Signal1<Dynamic> = new Signal1();
+		signals.set(requestCounter, signal);
 		connection.signedRequestCall.call([requestCounter, request], onResult );
-		return signaler;
+		return signal;
 	}
 	
 	private function onResult(result : Dynamic):Void 
 	{
-		var signaler : Signaler<Dynamic> = signalers.get(result.id);
-		signalers.clr(result.id);
-		signaler.dispatch(result);
+		var signal : Signal1<Dynamic> = signals.get(result.id);
+		signals.clr(result.id);
+		signal.dispatch(result);
 	}
 	
 }

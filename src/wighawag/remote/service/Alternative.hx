@@ -1,5 +1,13 @@
-package com.wighawag.remote.service;
-import nme.errors.Error;
+/****
+* Wighawag License:
+* - free to use for commercial and non commercial application
+* - provided the modification done to it are given back to the community
+* - use at your own risk
+* 
+****/
+
+package wighawag.remote.service;
+import flash.errors.Error;
 
 
 class Alternative<Primary,Secondary>

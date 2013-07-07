@@ -1,18 +1,21 @@
-package com.wighawag.remote.authentification;
+/****
+* Wighawag License:
+* - free to use for commercial and non commercial application
+* - provided the modification done to it are given back to the community
+* - use at your own risk
+* 
+****/
 
-import nme.events.Event;
-import nme.events.IOErrorEvent;
-import nme.Lib;
-import nme.net.URLLoader;
-import nme.net.URLRequest;
-import nme.net.URLLoaderDataFormat;
-import nme.net.URLRequestMethod;
-import nme.net.URLVariables;
-import hxjson2.JSON;
-import haxe.Http;
+package wighawag.remote.authentification;
 
-import hsl.haxe.DirectSignaler;
-import hsl.haxe.Signaler;
+import haxe.Json;
+import flash.events.Event;
+import flash.events.IOErrorEvent;
+import flash.net.URLLoader;
+import flash.net.URLRequest;
+import flash.net.URLRequestMethod;
+import flash.net.URLVariables;
+import msignal.Signal;
 
 class TestPlayerAutentification 
 {
@@ -22,7 +25,7 @@ class TestPlayerAutentification
 	private var password:String;
 	private var testUserId:String;
 	
-	private var onAuthenticated : Signaler<Dynamic>;
+	private var onAuthenticated : Signal1<Dynamic>;
 	
 
 	public function new(url : String, userId : String, password : String, testUserId : String)
@@ -33,7 +36,7 @@ class TestPlayerAutentification
 		this.testUserId = testUserId;
 	}
 	
-	public function connect() : Signaler<Dynamic>
+	public function connect() : Signal1<Dynamic>
 	{
 		var request : URLRequest = new URLRequest(url);
 		request.method = URLRequestMethod.POST;
@@ -44,7 +47,7 @@ class TestPlayerAutentification
 		urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
 		urlLoader.load(request);
 		
-		onAuthenticated = new DirectSignaler(this);
+		onAuthenticated = new Signal1();
 		return onAuthenticated;
 	}
 	
@@ -58,7 +61,7 @@ class TestPlayerAutentification
 	
 	private function onComplete(e:Event):Void 
 	{
-		var data : Dynamic = JSON.parse(e.target.data);
+		var data : Dynamic = Json.parse(e.target.data);
 		onAuthenticated.dispatch(data);
 	}
 	

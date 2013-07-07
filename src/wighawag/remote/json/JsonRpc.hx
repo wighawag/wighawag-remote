@@ -1,12 +1,18 @@
-package com.wighawag.remote.json;
-import hsl.haxe.DirectSignaler;
-import com.wighawag.remote.RemoteCall;
+/****
+* Wighawag License:
+* - free to use for commercial and non commercial application
+* - provided the modification done to it are given back to the community
+* - use at your own risk
+* 
+****/
+
+package wighawag.remote.json;
+import haxe.Json;
+import wighawag.remote.RemoteCall;
 import haxe.Http;
-import hsl.haxe.Signaler;
 import de.polygonal.ds.IntHashTable;
-import hxjson2.JSON;
-import de.polygonal.core.io.Base64;
-import haxe.SHA1;
+import de.polygonal.core.codec.Base64;
+import msignal.Signal;
 
 class JsonRpc implements RemoteCall{
 
@@ -16,7 +22,7 @@ class JsonRpc implements RemoteCall{
 
     private var requestCounter : Int;
 
-    private var signalers : IntHashTable<Signaler<Dynamic>> ;
+    private var signals : IntHashTable<Signal1<Dynamic>> ;
 
     public function new(url : String, playerId : String, secretKey : String)
     {
@@ -24,11 +30,11 @@ class JsonRpc implements RemoteCall{
         this.playerId = playerId;
         this.secretKey = secretKey;
         requestCounter = 0;
-        signalers = new IntHashTable<Signaler<Dynamic>>(16);
+        signals = new IntHashTable<Signal1<Dynamic>>(16);
     }
 
 
-    public function signedRequestCall(params : Array<Dynamic>): Signaler<Dynamic>
+    public function signedRequestCall(params : Array<Dynamic>): Signal1<Dynamic>
     {
         requestCounter += 1;
 
@@ -41,19 +47,19 @@ class JsonRpc implements RemoteCall{
         }
 
 
-        var jsonData : String = JSON.stringify(parameters);
+        var jsonData : String = Json.stringify(parameters);
         var data : String = Base64.encodeString(jsonData);
 
 
-        var signature : String = SHA1.encode(secretKey + data + secretKey);
+        var signature : String = haxe.crypto.Sha1.encode(secretKey + data + secretKey);
 
 
         var encoded_signature :String = Base64.encodeString(signature);
 
         var request : String = encoded_signature + "." + data;
 
-        var signaler : Signaler<Dynamic> = new DirectSignaler<Dynamic>(this);
-        signalers.set(requestCounter, signaler);
+        var signal : Signal1<Dynamic> = new Signal1();
+        signals.set(requestCounter, signal);
 
         var jsonRpcCall : String = '{"id" : ' + requestCounter + ', "method" : "signedRequestCall", "params": ["' + request + '"] }';
 
@@ -68,12 +74,12 @@ class JsonRpc implements RemoteCall{
 
         http.request(true);
 
-        return signaler;
+        return signal;
     }
 
     private function onResult(data : String):Void
     {
-        var result : Dynamic = JSON.parse(data);
+        var result : Dynamic = Json.parse(data);
 
         if (!Reflect.hasField(result, 'id') || result.id == 'unknown')
         {
@@ -81,9 +87,9 @@ class JsonRpc implements RemoteCall{
         }
         else
         {
-            var signaler : Signaler<Dynamic> = signalers.get(result.id);
-            signalers.clr(result.id);
-            signaler.dispatch(result);
+            var signal : Signal1<Dynamic> = signals.get(result.id);
+            signals.clr(result.id);
+            signal.dispatch(result);
         }
     }
 }

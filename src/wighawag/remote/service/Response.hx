@@ -1,35 +1,43 @@
-package com.wighawag.remote.service;
+/****
+* Wighawag License:
+* - free to use for commercial and non commercial application
+* - provided the modification done to it are given back to the community
+* - use at your own risk
+* 
+****/
 
-import com.wighawag.remote.Channels;
-import hsl.haxe.DirectSignaler;
-import hsl.haxe.Signaler;
+package wighawag.remote.service;
+
+import wighawag.remote.Channels;
+
+import msignal.Signal;
 
 class Response<SuccessType, ErrorType : ServiceError>
 {
 	
-	private var successSignaler : Signaler<SuccessType>;
-	private var errorSignaler : Signaler<ErrorType>;
+	private var successSignal : Signal1<SuccessType>;
+	private var errorSignal : Signal1<ErrorType>;
 	private var errorListenedTo : Bool;
 	private var successListenedTo : Bool;
 	
 	
 	public function new() 
 	{
-		successSignaler = new DirectSignaler<SuccessType>(this);
-		errorSignaler = new DirectSignaler<ErrorType>(this);
+		successSignal = new Signal1();
+		errorSignal = new Signal1();
 	}
 	
 	public function onSuccess(f : SuccessType -> Void) : Response<SuccessType, ErrorType>
 	{
 		successListenedTo = true;
-		successSignaler.bind(f);
+		successSignal.add(f);
 		return this;
 	}
 	
 	public function onError(f : ErrorType -> Void) : Response<SuccessType, ErrorType>
 	{
 		errorListenedTo = true;
-		errorSignaler.bind(f);
+		errorSignal.add(f);
 		return this;
 	}
 	
@@ -41,12 +49,12 @@ class Response<SuccessType, ErrorType : ServiceError>
 		{
 			Report.anError(Channels.REMOTE, error.text);
 		}
-		errorSignaler.dispatch(error);
+		errorSignal.dispatch(error);
 	}
 	
 	public function processSuccess(success : SuccessType) : Void
 	{
-		successSignaler.dispatch(success);
+		successSignal.dispatch(success);
 	}
 	
 }

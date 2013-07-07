@@ -1,17 +1,21 @@
-package com.wighawag.remote.local;
+/****
+* Wighawag License:
+* - free to use for commercial and non commercial application
+* - provided the modification done to it are given back to the community
+* - use at your own risk
+* 
+****/
 
-import com.wighawag.remote.service.Alternative;
-import com.wighawag.remote.service.ErrorMessage;
-import com.wighawag.remote.service.HighScoreService;
-import com.wighawag.remote.service.Response;
-import com.wighawag.remote.service.RetryMessage;
-import com.wighawag.remote.service.Score;
-import com.wighawag.remote.service.Seed;
+package wighawag.remote.local;
+
+import wighawag.remote.service.Alternative;
+import wighawag.remote.service.ErrorMessage;
+import wighawag.remote.service.HighScoreService;
+import wighawag.remote.service.Response;
+import wighawag.remote.service.RetryMessage;
+import wighawag.remote.service.Score;
+import wighawag.remote.service.Seed;
 import haxe.Timer;
-import nme.Lib;
-
-import hsl.haxe.DirectSignaler;
-import hsl.haxe.Signaler;
 
 class DynamicObject implements Dynamic {
 	public function new(){}
