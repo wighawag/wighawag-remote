@@ -1,12 +1,12 @@
 {
   "name": "wighawag-remote",
   "url" : "https://github.wighawag/wighawag-remote/",
-  "license": "Wighawag",
+  "license": "GPL",
   "tags": ["cross"],
-  "description": "",
+  "description": "a lib to exchange data with server (json,amf)",
   "version": "0.0.1",
   "releasenote": "",
   "contributors": ["wighawag"],
-  "dependencies": {"wighawag-report":""},
+  "dependencies": {"wighawag-report":"0.0.1"},
   "classPath":"src"
 }
